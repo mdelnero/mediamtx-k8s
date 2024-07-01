@@ -1,0 +1,92 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: computervision
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mediamtx-volume
+  labels:
+    app: mediamtx
+spec:
+  storageClassName: microk8s-hostpath
+  claimRef:
+    name: mediamtx-volume-claim
+    namespace: computervision
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/kubestorage"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mediamtx-volume-claim
+  namespace: computervision
+  labels:
+    app: mediamtx
+spec:
+  storageClassName: microk8s-hostpath
+  volumeName: mediamtx-volume
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mediamtx
+  namespace: computervision
+  labels:
+    app: mediamtx
+spec:
+  selector:
+    matchLabels:
+      app: mediamtx
+  template:
+    metadata:
+      labels:
+        app: mediamtx
+    spec:
+      containers:
+      - name: mediamtx
+        image: bluenviron/mediamtx:1.8.2-ffmpeg
+        args: ["/data/mediamtx.yml"]
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 8554
+          - containerPort: 1935
+        volumeMounts:
+          - name: data-volume
+            mountPath: "/data"
+      volumes:
+        - name: "data-volume"
+          persistentVolumeClaim:
+            claimName: mediamtx-volume-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mediamtx
+  namespace: computervision
+spec:
+  selector:
+    app: mediamtx
+  externalIPs:
+    - 10.245.0.97
+  ports:
+    - name: rtsp-8554
+      protocol: TCP
+      port: 8554
+      targetPort: 8554
+    - name: rtmp-1935
+      protocol: TCP
+      port: 1935
+      targetPort: 1935
+  type: LoadBalancer

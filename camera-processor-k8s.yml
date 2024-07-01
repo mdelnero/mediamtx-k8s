@@ -1,0 +1,53 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: camera-processor
+  namespace: computervision
+  labels:
+    app: camera-processor
+spec:
+  selector:
+    matchLabels:
+      app: camera-processor
+  template:
+    metadata:
+      labels:
+        app: camera-processor
+    spec:
+      containers:
+      - name: camera-processor
+        image: camera-processor:latest
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - name: data-volume
+            mountPath: "/data"
+        env:          
+          - name: LOGGING_SOURCE
+            value: "CameraProcessor"          
+          - name: LOGGING_ENVIRONMENT
+            value: "Development"          
+          - name: LOGGING_NAMESPACE
+            value: "COGTIVE"          
+          - name: LOGGING_MINIMUM_LEVEL
+            value: "Debug"
+          - name: LOGGING_WRITE_TO_CONSOLE
+            value: "True"
+          - name: CLOUD_BUCKET_NAME
+            value: "cogtive_computer_vision_prod"
+          - name: CLOUD_CONTAINER_NAME
+            value: "video_frames"
+          - name: CLOUD_GOOGLE_CREDENTIALS
+            value: "ew0KICAidHlwZSI6ICJzZXJ2aWNlX2FjY291bnQiLA0KICAicHJvamVjdF9pZCI6ICJjb2d0aXZlLWFwcCIsDQogICJwcml2YXRlX2tleV9pZCI6ICJjZGVhZTE2MjVhNGFiMGNkM2FhOWRmMmNjYmMyZWY4N2NlNDhhZjcxIiwNCiAgInByaXZhdGVfa2V5IjogIi0tLS0tQkVHSU4gUFJJVkFURSBLRVktLS0tLVxuTUlJRXZnSUJBREFOQmdrcWhraUc5dzBCQVFFRkFBU0NCS2d3Z2dTa0FnRUFBb0lCQVFDZTRCRE41UE9jQytBdFxuV1E3QXVNQUFKbWk5Z3UxQ3FLZjduR0RTV1l5Q3p1RURYK3RRa2RIU1U1RENwcnpZRGwrQmJWL1lwaUM4aTNDQ1xuSThpaExORGtTeEFIeGVkaGE1N0x5ZVJxL1JFQ1ZBYk4zaDFPZnZrdG91aUV3d1ltSWNxYUZwQ2dxVTBHVWNmSVxuRWJSVmRHbjhHeWl0aHF4c0EwZGZEcEJBcGd5TTBrN0wwMUY1NU0xazJqTWZRNWtGK05DOWpCZ25LOG91eHVPWVxuenRUMnBnZnUyNjFTN1VpVXZpUGs5djhaQkpkVHRqVnY0UkhzcjdkdmM1NzlZUFgwWVgyQW5vMC9NRWFTOTgrYlxuT2tWTUk5cTN0dUJ5a2ZMbi9GVE1pSVJzekFtaCtzQkZXRXFwbUYxcEVtTXlzWEJOVHpjRFZFQjFoTlJUQW82eVxub3dLVmxuazNBZ01CQUFFQ2dnRUFOOEZydEU0Mm5odGUwNXRPL1p4NHFUVFJpanlCOW1SSSs1aXdNL0lBU1VIQVxuSHRhUk53Zk5xbkh3T2hlWTYzdnowWENvYzlndFllM1BrS1J0T3Y4RzJpOXJrMGJGUWwrcDdWdlBnU3FKeHhibFxuQW1lQ1FuTjJFQ2w5VDJZLzZLN3dNcTVibUQ2Q0RRY3pSUWZOa1RYWElnWUgrd25weGNoS3lsWEtreDJUQnZJVFxuWW9MVU1YR2lLMktlS2c5cE1QMGxZWHg1TlhoREJwVFlVQ2tYLzJDMElpU2ZXaDJZY1c0UENuWm9HY0YzVWhqT1xuWjVvdFlvR2JqWVhHSDdvblY3U1B3RWEzMExRVjlxNHFUZlpOQXpQVUVoTzVqUTI2VjcrRDZqejhzdUdmbUdlYlxuZDA2Wk5kRmtyay82N1M0SFFLUlRtOWFNczF1TlFMRU43eVBITEh6cm9RS0JnUURjTnNULzlnUVNOaWV3RGl1alxuME9WalhhL2c0QmFiSWs3UjE1YlJaY0ozYWlnNGZNSUZ5NEV5bCsrUG5RZkozcUxrdGxLS2hTQ2V6cEpvcUozelxub3dtdEJOUzlkazljcS9PRHBYNkJ4Uytnbkt6UXhYeko2MHpqalFybHg4MXFYQ1kyOEdiNnJVZnZoZGxwWmFNcFxuU2VZYjBKWXpYcEx0bUx4M1MvYVI0MlFESVFLQmdRQzRzWVBDOEhRM2lpa1RUVG5xTENEdUlmVmxuQmYzYk1Yb1xuU0NQdFJ2Q21CTnRWQkZRWDFvemlLRW1LTlEvbGVnUWNYZjFFcHQxaUZ1WjFiazhqVDRZenRFYmYrdzZINlJqR1xuL3pvTUVrR1djOHd2TTEyWUdXdTEzRGtNeEc5bzJWa3dEeVdoeXB2bW04NXN1cUVpNUhNZ2FxcXRnWWVMNHpFN1xuS3RhWmlCVkpWd0tCZ1FDMzRsQXNRSDF6eTU3bVoxN1BndzhaSTFGTElUUWZSTTIyY2lUeEk5ejRKRUFEczBHOFxuM3dzNmVSN0V1R2FaamZ4TnFXVlJZQXMyTU42VzRENU5CTlora0tzb3JoTmxHZnpVOEN1c0owRTNCNzFTODZYWlxuWWsrcEw4eHF4YVhrNjUvSmZvTXZUZVRrd01za05JZkRZWDd4dVFMRFVIUzJURFVNRlBXSEt1OEhvUUtCZ1FDeVxuMU9kUS9RUjZ0cU5aRmlDcXRyblgramVqZ0VYUWhKa0lkYm1ieVdIQVR0bVU4MUQ5bC9mb0Q3eE5QMTI2QTdBeFxuUzJ5dGFhallqblh0WkxicDZObDMvT25YZkQ4d3FDb2VuUWkyb1lLeVRFTjd2SSsyYzM3UW80RDE5TW92U3F6S1xuRlJDS0hTVmhZS0c2cytiTVkwbDZMTzVBZkRnajRnTk1XQWxjdGVCdWx3S0JnREJZSWhPeFJSRHVjNlJTUk11ZVxuVUNUWWlNaUd3SGdkWnU2SDBla1dmVVN6V2c0eG5JYmJjTEF2ZzU5MUNYbDBVY05YMkc2M1JYTkdzb3hEYit4SlxuZDBBaVpqUUI1RU5jUm4vNXhZTm95V1VPMTNNWTI5ZlhSVUxVeEMxM1ByN3pkUEp3VHpKVXd2WEFKT2JPZkk5ZFxuOGhZeDlqT0dBQUF6dXBSWTZlbTB5V1U0XG4tLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tXG4iLA0KICAiY2xpZW50X2VtYWlsIjogImNvZ3RpdmUtZGV2b3BzQGNvZ3RpdmUtYXBwLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwNCiAgImNsaWVudF9pZCI6ICIxMDU5Nzc5NjIyMTQzODEzMTE5MDMiLA0KICAiYXV0aF91cmkiOiAiaHR0cHM6Ly9hY2NvdW50cy5nb29nbGUuY29tL28vb2F1dGgyL2F1dGgiLA0KICAidG9rZW5fdXJpIjogImh0dHBzOi8vb2F1dGgyLmdvb2dsZWFwaXMuY29tL3Rva2VuIiwNCiAgImF1dGhfcHJvdmlkZXJfeDUwOV9jZXJ0X3VybCI6ICJodHRwczovL3d3dy5nb29nbGVhcGlzLmNvbS9vYXV0aDIvdjEvY2VydHMiLA0KICAiY2xpZW50X3g1MDlfY2VydF91cmwiOiAiaHR0cHM6Ly93d3cuZ29vZ2xlYXBpcy5jb20vcm9ib3QvdjEvbWV0YWRhdGEveDUwOS9jb2d0aXZlLWRldm9wcyU0MGNvZ3RpdmUtYXBwLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwNCiAgInVuaXZlcnNlX2RvbWFpbiI6ICJnb29nbGVhcGlzLmNvbSINCn0="
+          - name: API_HOST
+            value: "https://api.cogtive.com.br"
+          - name: API_KEY
+            value: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnQiOiJrb3ZpIiwic3ViIjoiMjYzIiwidXNlcm5hbWUiOiJzYXAiLCJuYW1lIjoiU0FQIiwicm9sZXMiOiIiLCJuYmYiOjE3MTkzNDU2MjQsImV4cCI6MTgxMzk1MzYyNCwiaWF0IjoxNzE5MzQ1NjI0LCJpc3MiOiJDT0dUSVZFIiwiYXVkIjoiZXh0ZXJuYWwifQ.1mrSPBQbo2_Yk2XPtiyk6o-n_Q33w6Zv7iSxpXAC68g"
+          - name: INPUT_FOLDER
+            value: "/data/images/live"
+          - name: COMPUTER_VISION_API_HOST
+            value: "https://kovi-cv.cogtive.com.br"
+      volumes:
+        - name: "data-volume"
+          persistentVolumeClaim:
+            claimName: mediamtx-volume-claim
